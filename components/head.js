@@ -1,6 +1,6 @@
 import NextHead from 'next/head';
 
-export default function Head() {
+export default function Head({ children }) {
   return (
     <>
       <NextHead>
