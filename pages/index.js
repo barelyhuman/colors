@@ -4,12 +4,18 @@ import Spacer from 'components/spacer';
 import Mousetrap from 'mousetrap';
 
 export default function Home() {
-  const [color, setColor] = useState(generateRandomColor());
+  const [color, setColor] = useState();
   const [showMessage, setShowMessage] = useState(false);
 
   useEffect(() => {
     setupKeybinds();
   }, [color]);
+
+  useEffect(() => {
+    if (!color) {
+      setColor(generateRandomColor());
+    }
+  }, []);
 
   const handleRefreshColor = (e) => {
     setColor(generateRandomColor());
@@ -36,7 +42,7 @@ export default function Home() {
   return (
     <>
       <div className="color-container">
-        <div className="color"></div>
+        <div className="color" style={{ background: color }}></div>
         <Spacer y={2}></Spacer>
         <div className="color-code">
           {showMessage ? (
@@ -77,7 +83,6 @@ export default function Home() {
           }
 
           .color {
-            background: ${color};
             height: 250px;
             width: 250px;
             border-radius: 50%;
