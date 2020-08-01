@@ -8,6 +8,8 @@
     "start": "next start"
   },
   "dependencies": {
+    "animate.css": "^4.1.0",
+    "mousetrap": "^1.6.5",
     "next": "9.5.1",
     "react": "16.13.1",
     "react-dom": "16.13.1"

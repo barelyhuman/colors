@@ -1,65 +1,141 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import { useState, useEffect, useCallback } from 'react';
+import generateRandomColor from 'lib/generate-random-color';
+import Spacer from 'components/spacer';
+import Mousetrap from 'mousetrap';
 
 export default function Home() {
+  const [color, setColor] = useState(generateRandomColor());
+  const [showMessage, setShowMessage] = useState(false);
+
+  useEffect(() => {
+    setupKeybinds();
+  }, [color]);
+
+  const handleRefreshColor = (e) => {
+    setColor(generateRandomColor());
+  };
+
+  const handleCopyClick = (e) => {
+    const el = document.createElement('textarea');
+    el.value = color;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    setShowMessage(true);
+    setTimeout(() => {
+      setShowMessage(false);
+    }, 1000);
+  };
+
+  function setupKeybinds() {
+    Mousetrap.bind('r', () => handleRefreshColor());
+    Mousetrap.bind('c', handleCopyClick);
+  }
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <>
+      <div className="color-container">
+        <div className="color"></div>
+        <Spacer y={2}></Spacer>
+        <div className="color-code">
+          {showMessage ? (
+            <span className="animate__animated animate__slideInLeft copied-text">
+              Copied
+            </span>
+          ) : (
+            <>
+              <p>{color}</p>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+              <div>
+                <button onClick={handleCopyClick}>
+                  <img src="/copy.svg" alt="" />
+                </button>
+                <Spacer x={1} inline></Spacer>
+                <button onClick={handleRefreshColor}>
+                  <img src="/refresh-cw.svg" alt="" />
+                </button>
+              </div>
+            </>
+          )}
         </div>
-      </main>
+        <div className="shortcut-keys">
+          <p>[r] - Change color</p>
+          <Spacer y={0.5}></Spacer>
+          <p>[c] - Copy color</p>
+        </div>
+      </div>
+      <style jsx>
+        {`
+          .color-container {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+          }
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
-  )
+          .color {
+            background: ${color};
+            height: 250px;
+            width: 250px;
+            border-radius: 50%;
+            border: 10px solid #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          }
+
+          .color-code {
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+            display: flex;
+            color: #666;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            height: 42px;
+            min-width: 250px;
+            font-size: 18px;
+            padding: 0 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          }
+
+          button {
+            background: white;
+            height: 32px;
+            width: 32px;
+            display: inline-flex;
+            align-items: center;
+            outline: black;
+            border: 0px;
+            justify-content: center;
+          }
+
+          button > img {
+            filter: invert();
+          }
+
+          button:hover > img {
+            filter: none;
+          }
+
+          .shortcut-keys {
+            justify-content: center;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            color: #666;
+            font-size: 12px;
+          }
+
+          .shortcut-keys * {
+            padding: 0;
+            margin: 0;
+          }
+        `}
+      </style>
+    </>
+  );
 }
